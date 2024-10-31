@@ -23,7 +23,8 @@ export class CalculatorComponent {
   public lastOperator = computed(()=>this.calculatorService.lastOperator());
 
   handleClick (key: string) {
-    console.log({key})
+    /* console.log({key}) */
+    this.calculatorService.constructNumbers(key);
   }
 
   //@HostListener('document:keyup', ['$event'])
