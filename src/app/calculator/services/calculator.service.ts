@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
 const numbers = ['0','1','2','3','4','5','6','7','8','9'];
-const operators = ['+','-','*','/'];
+const operators = ['+','-','*','/','x','÷'];
 const specialOperators = ['=','.','C','Backspace','%','+/-'];
 
 @Injectable({
@@ -21,6 +21,8 @@ export class CalculatorService {
 
     //Calcular resultados
     if(value === '=') {
+      if(this.subResultText() === '0') return;
+      this.calculteResult();
       console.log('calcular resultado');
       return;
     };
@@ -34,13 +36,18 @@ export class CalculatorService {
     };
 
     // Backspace
-    //TODO: revisar cuando tengamos números negativos
     if(value === 'Backspace') {
       if( this.resultText() === '0' ) return;
-      if( this.resultText().length === 1 ) {
+      if( this.resultText().length === 1  || this.resultText() === '-0') {
         this.resultText.set('0');
         return;
       };
+
+       //Revisar cuando tengamos números negativos
+      if( this.resultText().length === 2 && this.resultText().includes('-') ) {
+        this.resultText.set('0');
+        return;
+      }
 
       this.resultText.update( currentValue => currentValue.slice(0,-1) );
       return;
@@ -104,5 +111,44 @@ export class CalculatorService {
     }
 
   };
+
+  public calculteResult() {
+    const number = parseFloat( this.subResultText() );
+    const number2 = parseFloat( this.resultText() );
+
+    let result = 0;
+
+    switch(this.lastOperator()) {
+      case '+':
+        if(this.subResultText().includes('-')) {
+          result = number2 + number;
+          result;
+        }
+        result = number + number2;
+        break;
+      case '-':
+        result = number - number2;
+        break;
+      case '*':
+        result = number * number2;
+        break;
+      case 'x':
+        result = number * number2;
+        break;
+      case '/':
+        result = number / number2;
+        break;
+      case '÷':
+        result = number / number2;
+        break;
+        //TODO: Lógica para el operado de %
+      /* case '%':
+        result =  ;
+        break; */
+    };
+
+    this.resultText.set(result.toString());
+    this.subResultText.set('0');
+  }
 
 }
